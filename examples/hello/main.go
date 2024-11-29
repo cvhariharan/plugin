@@ -23,5 +23,7 @@ func main() {
 	}
 
 	client := c.(hello.Hello)
+
+	// use the client just like any normal object
 	fmt.Println(client.Greet())
 }

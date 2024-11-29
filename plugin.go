@@ -121,9 +121,9 @@ func Serve(p Plugin) error {
 		if err != nil {
 			return err
 		}
-		fmt.Println(lis.Addr().String())
 		defer lis.Close()
 	}
+	fmt.Println(lis.Addr().String())
 
 	srv := getGRPCServer()
 	p.Server(srv)
