@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package hello;
+
+option go_package = "plugin/example/hello/protos";
+
+service Hello {
+    rpc Greet(Empty) returns (Resp);
+}
+
+message Empty {}
+
+message Resp {
+    string hello = 1;
+}
