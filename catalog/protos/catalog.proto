@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package catalog;
+
+option go_package = "github.com/cvhariharan/plugin/catalog/protogen";
+
+service Catalog {
+    rpc Add(Service) returns (Empty);
+    rpc Get(GetReq) returns (Service);
+}
+
+message GetReq {
+    string name = 1;
+}
+
+enum SocketType {
+    TCP = 0;
+    UNIX = 1;
+}
+
+message Service {
+    string name = 1;
+    string address = 2;
+    SocketType socket_type = 3;
+}
+
+message Empty {}
