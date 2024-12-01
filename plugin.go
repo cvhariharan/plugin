@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net"
-	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -70,7 +69,6 @@ func loadRemote(opt PluginLoadOptions) (interface{}, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error connecting to remote plugin: %v", err)
 	}
-
 	p := opt.PluginMap[opt.Name]
 
 	return p.Client(conn)
@@ -173,11 +171,11 @@ func Serve(p Plugin, opt PluginServeOptions) error {
 			}
 		}
 
-		u, err := url.Parse(fmt.Sprintf("%s://%s:%d", reqSocket, localIP, lis.Addr().(*net.TCPAddr).Port))
+		resp.Address = fmt.Sprintf("%s:%d", localIP, lis.Addr().(*net.TCPAddr).Port)
+		_, _, err = net.SplitHostPort(resp.Address)
 		if err != nil {
 			return fmt.Errorf("could not get plugin address: %v", err)
 		}
-		resp.Address = u.String()
 
 	case SOCKET_TYPE_UNIX:
 		reqSocket = protogen.SocketType_UNIX
