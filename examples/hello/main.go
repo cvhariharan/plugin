@@ -30,9 +30,8 @@ func main() {
 			// If address is set, remote plugin will be loaded
 			// Address: svc.Address,
 			Path: "plugin/hello",
-			PluginMap: map[string]plugin.Plugin{
-				"hello": &hello.HelloPlugin{},
-			},
+			// This specifies the exact plugin type
+			Plugin: &hello.HelloPlugin{},
 		},
 		cs,
 	)
@@ -40,6 +39,7 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// cast to the interface we expect
 	client := c.(hello.Hello)
 
 	// use the client just like any normal object

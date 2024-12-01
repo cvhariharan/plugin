@@ -36,10 +36,10 @@ type Plugin interface {
 }
 
 type PluginLoadOptions struct {
-	Name      string
-	Path      string
-	Address   string
-	PluginMap map[string]Plugin
+	Name    string
+	Path    string
+	Address string
+	Plugin  Plugin
 }
 
 type PluginServeOptions struct {
@@ -69,9 +69,8 @@ func loadRemote(opt PluginLoadOptions) (interface{}, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error connecting to remote plugin: %v", err)
 	}
-	p := opt.PluginMap[opt.Name]
 
-	return p.Client(conn)
+	return opt.Plugin.Client(conn)
 }
 
 // loadProcess starts the plugin in a subprocess and returns the client
@@ -105,8 +104,6 @@ func loadProcess(opt PluginLoadOptions, cs store.CatalogStore) (interface{}, err
 		return nil, fmt.Errorf("plugin did not provide a valid address")
 	}
 
-	p := opt.PluginMap[opt.Name]
-
 	dialer := func(ctx context.Context, addr string) (net.Conn, error) {
 		return net.Dial("unix", pluginResp.Address)
 	}
@@ -129,7 +126,7 @@ func loadProcess(opt PluginLoadOptions, cs store.CatalogStore) (interface{}, err
 		return nil, fmt.Errorf("could not add service %s to catalog store", opt.Name)
 	}
 
-	return p.Client(conn)
+	return opt.Plugin.Client(conn)
 }
 
 // Serve starts a gRPC server for the plugin and listens on the provided address.
