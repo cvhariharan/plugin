@@ -133,23 +133,35 @@ func loadProcess(opt PluginLoadOptions, cs store.CatalogStore) (interface{}, err
 // If host is empty, it binds to all interfaces but returns the first non-loopback local IP address for the client and discovery server.
 func Serve(p Plugin, opt PluginServeOptions) error {
 	socketType := os.Getenv(PLUGIN_SOCKET_TYPE)
+	if socketType == "" {
+		socketType = SOCKET_TYPE_TCP
+	}
+
+	var resp PluginResponse
+	resp.SocketType = socketType
 
 	var lis net.Listener
 	var err error
 	var reqSocket protogen.SocketType
-	var resp PluginResponse
-	resp.SocketType = socketType
+
 	switch socketType {
 	case SOCKET_TYPE_TCP:
 		reqSocket = protogen.SocketType_TCP
-		min, err := strconv.Atoi(os.Getenv(PLUGIN_MIN_PORT))
-		if err != nil {
-			return fmt.Errorf("PLUGIN_MIN_PORT could not be parsed into int: %v", err)
+		min := MIN_PORT
+		max := MAX_PORT
+
+		if envMin := os.Getenv(PLUGIN_MIN_PORT); envMin != "" {
+			min, err = strconv.Atoi(envMin)
+			if err != nil {
+				return fmt.Errorf("error parsing %s as int: %v", PLUGIN_MIN_PORT, err)
+			}
 		}
 
-		max, err := strconv.Atoi(os.Getenv(PLUGIN_MAX_PORT))
-		if err != nil {
-			return fmt.Errorf("PLUGIN_MAX_PORT could not be parsed into int: %v", err)
+		if envMax := os.Getenv(PLUGIN_MAX_PORT); envMax != "" {
+			max, err = strconv.Atoi(envMax)
+			if err != nil {
+				return fmt.Errorf("error parsing %s as int: %v", PLUGIN_MAX_PORT, err)
+			}
 		}
 
 		lis, err = getTCPPort(min, max)
