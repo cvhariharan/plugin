@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package serialize;
+
+option go_package = "plugin/example/serialize/protos";
+
+service Test {
+    rpc TestCall(Obj) returns (Resp);
+}
+
+message Obj {
+    bytes serialized_objects = 1;
+    string type_name = 2;
+}
+
+message Resp {
+    string response = 1;
+}
